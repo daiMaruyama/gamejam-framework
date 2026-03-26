@@ -1,0 +1,11 @@
+{
+  "name": "com.maruyama.gamejam-scene.runtime",
+  "rootNamespace": "GameJamScene",
+  "references": [
+    "com.maruyama.gamejam-core.runtime",
+    "UniTask",
+    "DOTween.Modules"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}
