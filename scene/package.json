@@ -5,8 +5,6 @@
   "description": "シェーダーベースのシーン遷移トランジションモジュール",
   "unity": "6000.4",
   "dependencies": {
-    "com.maruyama.gamejam-core": "0.1.0",
-    "com.cysharp.unitask": "2.5.10",
-    "com.demigiant.dotween": "1.2.842"
+    "com.maruyama.gamejam-core": "0.1.0"
   }
 }
