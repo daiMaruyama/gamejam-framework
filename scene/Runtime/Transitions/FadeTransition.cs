@@ -26,14 +26,14 @@ namespace GameJamScene
 		{
 			_canvasGroup.blocksRaycasts = true;
 			await _canvasGroup.DOFade(1f, _duration).SetEase(_easeIn)
-				.SetUpdate(true).ToUniTask();
+				.SetUpdate(true).AsyncWaitForCompletion();
 		}
 
 		/// <summary>画面を開く（フェードアウト）。</summary>
 		public async UniTask Release()
 		{
 			await _canvasGroup.DOFade(0f, _duration).SetEase(_easeOut)
-				.SetUpdate(true).ToUniTask();
+				.SetUpdate(true).AsyncWaitForCompletion();
 			_canvasGroup.blocksRaycasts = false;
 		}
 	}
