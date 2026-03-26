@@ -2,7 +2,7 @@
   "name": "com.maruyama.gamejam-scene.runtime",
   "rootNamespace": "GameJamScene",
   "references": [
-    "com.maruyama.gamejam-core.runtime",
+    "GUID:4da709e55248606d2dbd62440667468d",
     "UniTask",
     "DOTween.Modules"
   ],
