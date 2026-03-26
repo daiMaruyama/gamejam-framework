@@ -1,0 +1,7 @@
+{
+  "name": "com.maruyama.gamejam-core.runtime",
+  "rootNamespace": "GameJamCore",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}
