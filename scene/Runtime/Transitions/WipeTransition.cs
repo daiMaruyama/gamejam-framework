@@ -7,7 +7,7 @@ namespace GameJamScene
 	/// <summary>
 	/// 横方向のワイプで画面を覆うトランジション。
 	/// Canvas 配下に画面全体を覆うパネル（Stretch 設定）を作り、アタッチして使う。
-	/// パネルの Anchors は四隅 Stretch（Min 0,0 / Max 1,1）、Offsets は全て 0 にしておくこと。
+	/// Pivot の X を 0 にすると左から、1 にすると右からワイプする。
 	/// </summary>
 	public class WipeTransition : MonoBehaviour, ITransition
 	{
@@ -16,29 +16,23 @@ namespace GameJamScene
 		[SerializeField] private Ease _easeIn = Ease.OutQuad;
 		[SerializeField] private Ease _easeOut = Ease.InQuad;
 
-		private float _canvasWidth;
-
-		private void Start()
+		private void Awake()
 		{
-			var canvas = _panel.GetComponentInParent<Canvas>().rootCanvas;
-			_canvasWidth = ((RectTransform)canvas.transform).rect.width;
-			_panel.anchoredPosition = new Vector2(-_canvasWidth, 0f);
+			_panel.localScale = new Vector3(0f, 1f, 1f);
 		}
 
-		/// <summary>画面を左から右にワイプして覆う。</summary>
+		/// <summary>画面をワイプして覆う。</summary>
 		public async UniTask Play()
 		{
-			await _panel.DOAnchorPosX(0f, _duration)
+			await _panel.DOScaleX(1f, _duration)
 				.SetEase(_easeIn).SetUpdate(true).ToUniTask();
 		}
 
-		/// <summary>画面を左から右にワイプして開く。</summary>
+		/// <summary>画面をワイプして開く。</summary>
 		public async UniTask Release()
 		{
-			await _panel.DOAnchorPosX(_canvasWidth, _duration)
+			await _panel.DOScaleX(0f, _duration)
 				.SetEase(_easeOut).SetUpdate(true).ToUniTask();
-
-			_panel.anchoredPosition = new Vector2(-_canvasWidth, 0f);
 		}
 	}
 }
