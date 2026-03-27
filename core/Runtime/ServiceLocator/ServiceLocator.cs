@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace GameJamCore
 {
@@ -10,6 +11,12 @@ namespace GameJamCore
 	public static class ServiceLocator
 	{
 		private static readonly Dictionary<Type, object> _services = new();
+
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+		private static void ResetForPlayMode()
+		{
+			_services.Clear();
+		}
 
 		/// <summary>
 		/// サービスを登録する。同じ型で再登録すると上書きされる。
