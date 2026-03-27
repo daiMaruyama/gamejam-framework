@@ -6,7 +6,8 @@ namespace GameJamScene
 {
 	/// <summary>
 	/// 横方向のワイプで画面を覆うトランジション。
-	/// 画面全体を覆える RectTransform を持つ UI にアタッチして使う。
+	/// Canvas 配下に画面全体を覆うパネル（Stretch 設定）を作り、アタッチして使う。
+	/// パネルの Anchors は四隅 Stretch（Min 0,0 / Max 1,1）、Offsets は全て 0 にしておくこと。
 	/// </summary>
 	public class WipeTransition : MonoBehaviour, ITransition
 	{
@@ -17,43 +18,23 @@ namespace GameJamScene
 
 		private void Awake()
 		{
-			_panel.anchorMin = new Vector2(-1f, 0f);
-			_panel.anchorMax = new Vector2(0f, 1f);
-			_panel.offsetMin = Vector2.zero;
-			_panel.offsetMax = Vector2.zero;
+			_panel.anchoredPosition = new Vector2(-Screen.width, 0f);
 		}
 
 		/// <summary>画面を左から右にワイプして覆う。</summary>
 		public async UniTask Play()
 		{
-			await DOTween.To(
-				() => _panel.anchorMin.x,
-				x =>
-				{
-					_panel.anchorMin = new Vector2(x, 0f);
-					_panel.anchorMax = new Vector2(x + 1f, 1f);
-				},
-				0f,
-				_duration
-			).SetEase(_easeIn).SetUpdate(true).ToUniTask();
+			await _panel.DOAnchorPosX(0f, _duration)
+				.SetEase(_easeIn).SetUpdate(true).ToUniTask();
 		}
 
 		/// <summary>画面を左から右にワイプして開く。</summary>
 		public async UniTask Release()
 		{
-			await DOTween.To(
-				() => _panel.anchorMin.x,
-				x =>
-				{
-					_panel.anchorMin = new Vector2(x, 0f);
-					_panel.anchorMax = new Vector2(x + 1f, 1f);
-				},
-				1f,
-				_duration
-			).SetEase(_easeOut).SetUpdate(true).ToUniTask();
+			await _panel.DOAnchorPosX(Screen.width, _duration)
+				.SetEase(_easeOut).SetUpdate(true).ToUniTask();
 
-			_panel.anchorMin = new Vector2(-1f, 0f);
-			_panel.anchorMax = new Vector2(0f, 1f);
+			_panel.anchoredPosition = new Vector2(-Screen.width, 0f);
 		}
 	}
 }
