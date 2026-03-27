@@ -32,6 +32,19 @@ namespace GameJamScene
 		}
 
 		/// <summary>
+		/// 破棄時に ServiceLocator から自身を解除する。
+		/// 通常は DontDestroyOnLoad のためアプリ終了時のみ呼ばれるが、
+		/// テストやサービス差し替え時に電話帳にゴミが残るのを防ぐ。
+		/// </summary>
+		private void OnDestroy()
+		{
+			if (ServiceLocator.TryGet<ISceneService>(out var registered) && registered == this)
+			{
+				ServiceLocator.Unregister<ISceneService>();
+			}
+		}
+
+		/// <summary>
 		/// トランジション付きでシーンを遷移する。
 		/// transition を省略すると Inspector で設定したデフォルトトランジションを使う。
 		/// 遷移中に呼ばれた場合は無視される。
