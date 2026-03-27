@@ -16,9 +16,16 @@ namespace GameJamScene
 		[SerializeField] private MonoBehaviour _defaultTransitionComponent;
 
 		private ITransition _defaultTransition;
+		private bool _isLoading;
 
 		private void Awake()
 		{
+			if (ServiceLocator.TryGet<ISceneService>(out _))
+			{
+				Destroy(gameObject);
+				return;
+			}
+
 			_defaultTransition = _defaultTransitionComponent as ITransition;
 			DontDestroyOnLoad(gameObject);
 			ServiceLocator.Register<ISceneService>(this);
@@ -27,21 +34,36 @@ namespace GameJamScene
 		/// <summary>
 		/// トランジション付きでシーンを遷移する。
 		/// transition を省略すると Inspector で設定したデフォルトトランジションを使う。
+		/// 遷移中に呼ばれた場合は無視される。
 		/// </summary>
 		public async UniTask LoadAsync(string sceneName, ITransition transition = null)
 		{
-			var activeTransition = transition ?? _defaultTransition;
-
-			if (activeTransition != null)
+			if (_isLoading)
 			{
-				await activeTransition.Play();
+				return;
 			}
 
-			await SceneManager.LoadSceneAsync(sceneName);
+			_isLoading = true;
 
-			if (activeTransition != null)
+			try
 			{
-				await activeTransition.Release();
+				var activeTransition = transition ?? _defaultTransition;
+
+				if (activeTransition != null)
+				{
+					await activeTransition.Play();
+				}
+
+				await SceneManager.LoadSceneAsync(sceneName);
+
+				if (activeTransition != null)
+				{
+					await activeTransition.Release();
+				}
+			}
+			finally
+			{
+				_isLoading = false;
 			}
 		}
 	}
