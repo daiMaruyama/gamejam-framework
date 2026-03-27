@@ -16,9 +16,13 @@ namespace GameJamScene
 		[SerializeField] private Ease _easeIn = Ease.OutQuad;
 		[SerializeField] private Ease _easeOut = Ease.InQuad;
 
-		private void Awake()
+		private float _canvasWidth;
+
+		private void Start()
 		{
-			_panel.anchoredPosition = new Vector2(-Screen.width, 0f);
+			var canvas = _panel.GetComponentInParent<Canvas>().rootCanvas;
+			_canvasWidth = ((RectTransform)canvas.transform).rect.width;
+			_panel.anchoredPosition = new Vector2(-_canvasWidth, 0f);
 		}
 
 		/// <summary>画面を左から右にワイプして覆う。</summary>
@@ -31,10 +35,10 @@ namespace GameJamScene
 		/// <summary>画面を左から右にワイプして開く。</summary>
 		public async UniTask Release()
 		{
-			await _panel.DOAnchorPosX(Screen.width, _duration)
+			await _panel.DOAnchorPosX(_canvasWidth, _duration)
 				.SetEase(_easeOut).SetUpdate(true).ToUniTask();
 
-			_panel.anchoredPosition = new Vector2(-Screen.width, 0f);
+			_panel.anchoredPosition = new Vector2(-_canvasWidth, 0f);
 		}
 	}
 }
