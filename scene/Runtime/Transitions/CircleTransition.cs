@@ -18,6 +18,7 @@ namespace GameJamScene
 		[SerializeField] private Ease _easeOut = Ease.InQuad;
 
 		private Image _circleImage;
+		private Texture2D _texture;
 		private bool _isInitialized;
 
 		private void Awake()
@@ -25,8 +26,13 @@ namespace GameJamScene
 			var go = new GameObject("CircleOverlay");
 			go.transform.SetParent(transform, false);
 
+			_texture = new Texture2D(1, 1);
+			_texture.SetPixel(0, 0, Color.white);
+			_texture.Apply();
+			var sprite = Sprite.Create(_texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
+
 			_circleImage = go.AddComponent<Image>();
-			_circleImage.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/Background.psd");
+			_circleImage.sprite = sprite;
 			_circleImage.color = _color;
 			_circleImage.raycastTarget = false;
 			_circleImage.type = Image.Type.Filled;
@@ -41,6 +47,14 @@ namespace GameJamScene
 			rt.offsetMax = Vector2.zero;
 
 			_isInitialized = true;
+		}
+
+		private void OnDestroy()
+		{
+			if (_texture != null)
+			{
+				Destroy(_texture);
+			}
 		}
 
 		/// <summary>
