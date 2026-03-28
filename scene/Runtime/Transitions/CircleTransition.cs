@@ -26,6 +26,7 @@ namespace GameJamScene
 			go.transform.SetParent(transform, false);
 
 			_circleImage = go.AddComponent<Image>();
+			_circleImage.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/Background.psd");
 			_circleImage.color = _color;
 			_circleImage.raycastTarget = false;
 			_circleImage.type = Image.Type.Filled;
