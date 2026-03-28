@@ -61,31 +61,3 @@ public class MyTransition : TransitionBase
 ```
 
 Play() でシーン読み込み前の演出、Release() で読み込み後の演出を行う。
-
-## ShaderTransition（ルール画像トランジション）
-
-グレースケールのルール画像を差し替えるだけで、あらゆるパターンの遷移演出を実現できる汎用トランジション。
-
-### セットアップ
-
-1. Canvas 上に画面全体を覆う Image を作る（Sprite は空でOK）
-2. 同じ GameObject に `ShaderTransition` をアタッチ
-3. Inspector で以下を設定:
-   - **Overlay** — 画面を覆う Image
-   - **Shader** — `Packages/GameJam Scene/Runtime/Shaders/RuleTransition` をドラッグ
-   - **Rule Texture** — グレースケールのルール画像（省略可。未設定なら横ワイプで動作する）
-   - **Color** — 覆う色（デフォルト: 黒）
-   - **Softness** — 境界のぼかし量（0 でくっきり）
-4. SceneLoader の `Default Transition Component` に ShaderTransition をドラッグ
-
-### ルール画像の例
-
-| 画像パターン | 効果 |
-|-------------|------|
-| 横グラデーション | ワイプ（左→右） |
-| 中心からの放射グラデーション | 円形に開く/閉じる |
-| パーリンノイズ | ディゾルブ（砂のように溶ける） |
-| ダイヤモンドパターン | ひし形に開く |
-| ブロックパターン | モザイク状に消える |
-
-ルール画像は任意の画像編集ツールで作成できる。
