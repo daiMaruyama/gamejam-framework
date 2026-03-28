@@ -1,49 +1,73 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameJamScene
 {
 	/// <summary>
 	/// 左右方向のワイプで画面を覆うトランジション。
-	/// Canvas 上に画面全幅を覆う panel を用意し、アタッチして使う。
-	/// Pivot の X を 0 にすると左から、1 にすると右からワイプする。
+	/// 空の GameObject にアタッチするだけで、子要素は自動生成される。
+	/// 親の RectTransform を画面全体に引き伸ばして使う。
 	/// </summary>
 	public class WipeTransition : TransitionBase
 	{
-		[SerializeField] private RectTransform _panel;
+		[SerializeField] private Color _color = Color.black;
 		[SerializeField] private float _duration = 0.4f;
 		[SerializeField] private Ease _easeIn = Ease.OutQuad;
 		[SerializeField] private Ease _easeOut = Ease.InQuad;
+
+		private Image _panel;
 		private bool _isInitialized;
 
 		private void Awake()
 		{
-			if (_panel == null)
-			{
-				Debug.LogError("WipeTransition requires RectTransform panel reference.", this);
-				enabled = false;
-				return;
-			}
+			var go = new GameObject("WipePanel");
+			go.transform.SetParent(transform, false);
 
-			_panel.localScale = new Vector3(0f, 1f, 1f);
+			_panel = go.AddComponent<Image>();
+			_panel.color = _color;
+			_panel.raycastTarget = false;
+
+			var rt = _panel.rectTransform;
+			rt.anchorMin = Vector2.zero;
+			rt.anchorMax = Vector2.one;
+			rt.pivot = new Vector2(0f, 0.5f);
+			rt.offsetMin = Vector2.zero;
+			rt.offsetMax = Vector2.zero;
+			rt.localScale = new Vector3(0f, 1f, 1f);
+
 			_isInitialized = true;
 		}
 
+		/// <summary>
+		/// 左からワイプして画面を覆う。
+		/// </summary>
 		public override async UniTask Play()
 		{
-			if (!_isInitialized) return;
+			if (!_isInitialized)
+			{
+				return;
+			}
 
-			await _panel.DOScaleX(1f, _duration)
+			_panel.raycastTarget = true;
+			await _panel.rectTransform.DOScaleX(1f, _duration)
 				.SetEase(_easeIn).SetUpdate(true).ToUniTask();
 		}
 
+		/// <summary>
+		/// ワイプを戻して画面を開く。
+		/// </summary>
 		public override async UniTask Release()
 		{
-			if (!_isInitialized) return;
+			if (!_isInitialized)
+			{
+				return;
+			}
 
-			await _panel.DOScaleX(0f, _duration)
+			await _panel.rectTransform.DOScaleX(0f, _duration)
 				.SetEase(_easeOut).SetUpdate(true).ToUniTask();
+			_panel.raycastTarget = false;
 		}
 	}
 }
