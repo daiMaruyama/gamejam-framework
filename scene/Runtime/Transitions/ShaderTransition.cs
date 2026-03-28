@@ -16,9 +16,13 @@ namespace GameJamScene
 		/// <summary>画面全体を覆う Image。Sprite は不要（シェーダーが描画を担う）。</summary>
 		[SerializeField] private Image _overlay;
 
+		/// <summary>GameJam/RuleTransition シェーダーへの参照。パッケージ内の Shaders フォルダからドラッグする。</summary>
+		[SerializeField] private Shader _shader;
+
 		/// <summary>
 		/// 遷移パターンを決めるグレースケール画像。
 		/// 暗いピクセルから先に覆われる。
+		/// 未設定の場合は横グラデーション（左→右ワイプ）で動作する。
 		/// </summary>
 		[SerializeField] private Texture2D _ruleTexture;
 
@@ -32,6 +36,7 @@ namespace GameJamScene
 		[SerializeField] private Ease _easeOut = Ease.InQuad;
 
 		private Material _material;
+		private Texture2D _generatedTexture;
 		private bool _isInitialized;
 
 		private static readonly int ProgressId = Shader.PropertyToID("_Progress");
@@ -39,26 +44,58 @@ namespace GameJamScene
 		private static readonly int ColorId = Shader.PropertyToID("_Color");
 		private static readonly int RuleTexId = Shader.PropertyToID("_RuleTex");
 
+		/// <summary>
+		/// ルール画像が未設定の場合に横グラデーションを生成する。
+		/// </summary>
+		private Texture2D CreateFallbackTexture()
+		{
+			const int width = 256;
+			const int height = 1;
+			var texture = new Texture2D(width, height, TextureFormat.R8, false)
+			{
+				wrapMode = TextureWrapMode.Clamp,
+				filterMode = FilterMode.Bilinear
+			};
+
+			var pixels = new Color[width];
+
+			for (int x = 0; x < width; x++)
+			{
+				float value = (float)x / (width - 1);
+				pixels[x] = new Color(value, value, value);
+			}
+
+			texture.SetPixels(pixels);
+			texture.Apply();
+			return texture;
+		}
+
 		private void Awake()
 		{
-			if (_overlay == null || _ruleTexture == null)
+			if (_overlay == null)
 			{
-				Debug.LogError("ShaderTransition requires Image and RuleTexture references.", this);
+				Debug.LogError("ShaderTransition requires Image reference.", this);
 				enabled = false;
 				return;
 			}
 
-			var shader = Shader.Find("GameJam/RuleTransition");
-
-			if (shader == null)
+			if (_shader == null)
 			{
-				Debug.LogError("Shader 'GameJam/RuleTransition' not found. Always Include に追加してください。", this);
+				Debug.LogError("ShaderTransition requires Shader reference. Packages/GameJam Scene/Runtime/Shaders/RuleTransition をドラッグしてください。", this);
 				enabled = false;
 				return;
 			}
 
-			_material = new Material(shader);
-			_material.SetTexture(RuleTexId, _ruleTexture);
+			var activeTexture = _ruleTexture;
+
+			if (activeTexture == null)
+			{
+				_generatedTexture = CreateFallbackTexture();
+				activeTexture = _generatedTexture;
+			}
+
+			_material = new Material(_shader);
+			_material.SetTexture(RuleTexId, activeTexture);
 			_material.SetColor(ColorId, _color);
 			_material.SetFloat(SoftnessId, _softness);
 			_material.SetFloat(ProgressId, 0f);
@@ -73,6 +110,11 @@ namespace GameJamScene
 			if (_material != null)
 			{
 				Destroy(_material);
+			}
+
+			if (_generatedTexture != null)
+			{
+				Destroy(_generatedTexture);
 			}
 		}
 

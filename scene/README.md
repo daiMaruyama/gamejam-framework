@@ -72,11 +72,11 @@ Play() でシーン読み込み前の演出、Release() で読み込み後の演
 2. 同じ GameObject に `ShaderTransition` をアタッチ
 3. Inspector で以下を設定:
    - **Overlay** — 画面を覆う Image
-   - **Rule Texture** — グレースケールのルール画像（暗いピクセルから先に覆われる）
+   - **Shader** — `Packages/GameJam Scene/Runtime/Shaders/RuleTransition` をドラッグ
+   - **Rule Texture** — グレースケールのルール画像（省略可。未設定なら横ワイプで動作する）
    - **Color** — 覆う色（デフォルト: 黒）
    - **Softness** — 境界のぼかし量（0 でくっきり）
 4. SceneLoader の `Default Transition Component` に ShaderTransition をドラッグ
-5. Project Settings > Graphics > Always Included Shaders に `GameJam/RuleTransition` を追加
 
 ### ルール画像の例
 
