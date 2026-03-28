@@ -34,9 +34,9 @@ namespace GameJamScene
 		{
 			if (ServiceLocator.TryGet<ISceneService>(out _))
 			{
-				if (_defaultTransitionComponent != null && _defaultTransitionComponent.gameObject != gameObject)
+				if (_defaultTransitionComponent != null && _defaultTransitionComponent.transform.root != transform.root)
 				{
-					Destroy(_defaultTransitionComponent.gameObject);
+					Destroy(_defaultTransitionComponent.transform.root.gameObject);
 				}
 				Destroy(gameObject);
 				return;
@@ -45,9 +45,9 @@ namespace GameJamScene
 			_defaultTransition = _defaultTransitionComponent;
 
 			// Keep transition visuals alive across scene load so Release can run after LoadSceneAsync.
-			if (_defaultTransitionComponent != null && _defaultTransitionComponent.gameObject != gameObject)
+			if (_defaultTransitionComponent != null && _defaultTransitionComponent.transform.root != transform.root)
 			{
-				DontDestroyOnLoad(_defaultTransitionComponent.gameObject);
+				DontDestroyOnLoad(_defaultTransitionComponent.transform.root.gameObject);
 			}
 
 			DontDestroyOnLoad(gameObject);

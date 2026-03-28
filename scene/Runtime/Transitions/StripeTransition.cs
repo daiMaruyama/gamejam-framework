@@ -23,6 +23,7 @@ namespace GameJamScene
 		[SerializeField] private Ease _easeIn = Ease.OutBack;
 		[SerializeField] private Ease _easeOut = Ease.InQuad;
 
+		private Image _blocker;
 		private Image[] _strips;
 		private Sequence _sequence;
 		private bool _isInitialized;
@@ -35,6 +36,10 @@ namespace GameJamScene
 				enabled = false;
 				return;
 			}
+
+			_blocker = gameObject.AddComponent<Image>();
+			_blocker.color = Color.clear;
+			_blocker.raycastTarget = false;
 
 			_strips = new Image[_stripeCount];
 
@@ -77,12 +82,13 @@ namespace GameJamScene
 				return;
 			}
 
+			_blocker.raycastTarget = true;
+
 			_sequence?.Kill();
 			_sequence = DOTween.Sequence().SetUpdate(true);
 
 			for (int i = 0; i < _stripeCount; i++)
 			{
-				_strips[i].raycastTarget = true;
 				float delay = i * _stagger;
 				_sequence.Insert(delay, _strips[i].rectTransform.DOScaleY(1f, _duration).SetEase(_easeIn));
 			}
@@ -111,10 +117,7 @@ namespace GameJamScene
 
 			await _sequence.ToUniTask();
 
-			for (int i = 0; i < _stripeCount; i++)
-			{
-				_strips[i].raycastTarget = false;
-			}
+			_blocker.raycastTarget = false;
 		}
 	}
 }

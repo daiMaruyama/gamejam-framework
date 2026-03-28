@@ -24,6 +24,7 @@ namespace GameJamScene
 		[SerializeField] private Ease _easeIn = Ease.OutBack;
 		[SerializeField] private Ease _easeOut = Ease.InQuad;
 
+		private Image _blocker;
 		private Image[] _tiles;
 		private float[] _distances;
 		private float _maxDistance;
@@ -38,6 +39,10 @@ namespace GameJamScene
 				enabled = false;
 				return;
 			}
+
+			_blocker = gameObject.AddComponent<Image>();
+			_blocker.color = Color.clear;
+			_blocker.raycastTarget = false;
 
 			int count = _columns * _rows;
 			_tiles = new Image[count];
@@ -95,12 +100,13 @@ namespace GameJamScene
 				return;
 			}
 
+			_blocker.raycastTarget = true;
+
 			_sequence?.Kill();
 			_sequence = DOTween.Sequence().SetUpdate(true);
 
 			for (int i = 0; i < _tiles.Length; i++)
 			{
-				_tiles[i].raycastTarget = true;
 				float delay = (_distances[i] / _maxDistance) * _stagger;
 				_sequence.Insert(delay, _tiles[i].rectTransform.DOScale(1f, _duration).SetEase(_easeIn));
 			}
@@ -129,10 +135,7 @@ namespace GameJamScene
 
 			await _sequence.ToUniTask();
 
-			for (int i = 0; i < _tiles.Length; i++)
-			{
-				_tiles[i].raycastTarget = false;
-			}
+			_blocker.raycastTarget = false;
 		}
 	}
 }
