@@ -13,15 +13,9 @@ namespace GameJamScene
 	/// </summary>
 	public class DoorTransition : TransitionBase
 	{
-		[SerializeField] private Color _color = Color.black;
-		[SerializeField] private float _duration = 0.4f;
-		[SerializeField] private Ease _easeIn = Ease.OutCubic;
-		[SerializeField] private Ease _easeOut = Ease.InCubic;
-
 		private Image _leftDoor;
 		private Image _rightDoor;
 		private Sequence _sequence;
-		private bool _isInitialized;
 
 		private void Awake()
 		{

@@ -15,27 +15,21 @@ namespace GameJamScene
 	{
 		[SerializeField] private int _columns = 5;
 		[SerializeField] private int _rows = 5;
-		[SerializeField] private Color _color = Color.black;
-		[SerializeField] private float _duration = 0.25f;
 
 		/// <summary>中心から最も遠いタイルまでの最大遅延秒数。</summary>
 		[SerializeField] private float _stagger = 0.3f;
-
-		[SerializeField] private Ease _easeIn = Ease.OutBack;
-		[SerializeField] private Ease _easeOut = Ease.InQuad;
 
 		private Image _blocker;
 		private Image[] _tiles;
 		private float[] _distances;
 		private float _maxDistance;
 		private Sequence _sequence;
-		private bool _isInitialized;
 
 		private void Awake()
 		{
 			if (_columns <= 0 || _rows <= 0)
 			{
-				Debug.LogError("GridTransition requires columns > 0 and rows > 0.", this);
+				Debug.LogError($"[{GetType().Name}] columns と rows は 1 以上にしてください。", this);
 				enabled = false;
 				return;
 			}

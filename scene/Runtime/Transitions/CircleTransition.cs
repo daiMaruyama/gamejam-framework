@@ -12,14 +12,8 @@ namespace GameJamScene
 	/// </summary>
 	public class CircleTransition : TransitionBase
 	{
-		[SerializeField] private Color _color = Color.black;
-		[SerializeField] private float _duration = 0.5f;
-		[SerializeField] private Ease _easeIn = Ease.OutQuad;
-		[SerializeField] private Ease _easeOut = Ease.InQuad;
-
 		private Image _circleImage;
 		private Texture2D _texture;
-		private bool _isInitialized;
 
 		private void Awake()
 		{

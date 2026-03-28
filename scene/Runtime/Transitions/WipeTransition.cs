@@ -12,13 +12,7 @@ namespace GameJamScene
 	/// </summary>
 	public class WipeTransition : TransitionBase
 	{
-		[SerializeField] private Color _color = Color.black;
-		[SerializeField] private float _duration = 0.4f;
-		[SerializeField] private Ease _easeIn = Ease.OutQuad;
-		[SerializeField] private Ease _easeOut = Ease.InQuad;
-
 		private Image _panel;
-		private bool _isInitialized;
 
 		private void Awake()
 		{

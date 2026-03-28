@@ -14,25 +14,19 @@ namespace GameJamScene
 	public class StripeTransition : TransitionBase
 	{
 		[SerializeField] private int _stripeCount = 8;
-		[SerializeField] private Color _color = Color.black;
-		[SerializeField] private float _duration = 0.3f;
 
 		/// <summary>各ストライプ間の遅延秒数。大きいほど波が目立つ。</summary>
 		[SerializeField] private float _stagger = 0.05f;
 
-		[SerializeField] private Ease _easeIn = Ease.OutBack;
-		[SerializeField] private Ease _easeOut = Ease.InQuad;
-
 		private Image _blocker;
 		private Image[] _strips;
 		private Sequence _sequence;
-		private bool _isInitialized;
 
 		private void Awake()
 		{
 			if (_stripeCount <= 0)
 			{
-				Debug.LogError("StripeTransition requires stripeCount > 0.", this);
+				Debug.LogError($"[{GetType().Name}] stripeCount は 1 以上にしてください。", this);
 				enabled = false;
 				return;
 			}
