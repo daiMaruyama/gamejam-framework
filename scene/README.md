@@ -41,20 +41,19 @@ await ServiceLocator.Get<ISceneService>().LoadAsync("GameScene", wipeTransition)
 
 ## 独自トランジションを作る
 
-`ITransition` を実装した MonoBehaviour を作り、SceneLoader にアタッチするか LoadAsync の第2引数に渡す。
+`TransitionBase` を継承した MonoBehaviour を作り、SceneLoader にアタッチするか LoadAsync の第2引数に渡す。
 
 ```csharp
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
-public class WipeTransition : MonoBehaviour, ITransition
+public class MyTransition : TransitionBase
 {
-    public async UniTask Play()
+    public override async UniTask Play()
     {
         // 画面を覆う演出
     }
 
-    public async UniTask Release()
+    public override async UniTask Release()
     {
         // 画面を開く演出
     }
