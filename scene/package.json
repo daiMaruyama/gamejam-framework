@@ -2,8 +2,16 @@
   "name": "com.maruyama.gamejam-scene",
   "version": "0.1.0",
   "displayName": "GameJam Scene",
-  "description": "シェーダーベースのシーン遷移トランジションモジュール",
+  "description": "トランジション付きシーン遷移モジュール。アタッチするだけで Fade・Wipe・Circle・Stripe・Grid・Door の6種が使える。",
   "unity": "6000.4",
+  "keywords": [
+    "gamejam",
+    "scene",
+    "transition"
+  ],
+  "author": {
+    "name": "maruyama"
+  },
   "dependencies": {
     "com.maruyama.gamejam-core": "0.1.0"
   }
