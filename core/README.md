@@ -6,7 +6,7 @@
 
 Package Manager → Add package from git URL:
 
-```
+```text
 https://github.com/daiMaruyama/gamejam-framework.git?path=core
 ```
 

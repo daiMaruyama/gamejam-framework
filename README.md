@@ -23,11 +23,11 @@ ServiceLocator.Get<ISceneService>().LoadAsync("Title");
 |-----------|------|------|
 | core | ServiceLocator（電話帳本体） | なし |
 | scene | トランジション付きシーン遷移 | core, UniTask, DOTween |
-| audio | 音声管理（今後追加） | core |
+| audio | BGM・SE 再生（フェードイン/アウト、SE プール） | core, UniTask, DOTween |
 
 ## 導入手順
 
-### 1. 前提パッケージを入れる（scene を使う場合）
+### 1. 前提パッケージを入れる
 
 | パッケージ | 導入方法 |
 |-----------|---------|
@@ -38,11 +38,18 @@ ServiceLocator.Get<ISceneService>().LoadAsync("Title");
 
 Package Manager → Add package from git URL に**上から順に**入力:
 
-```
+```text
 https://github.com/daiMaruyama/gamejam-framework.git?path=core
 ```
-```
+
+使うモジュールを追加（scene・audio など）:
+
+```text
 https://github.com/daiMaruyama/gamejam-framework.git?path=scene
+```
+
+```text
+https://github.com/daiMaruyama/gamejam-framework.git?path=audio
 ```
 
 > core は全モジュールの依存先なので必ず最初に入れること。
@@ -113,5 +120,5 @@ ServiceLocator.Get<IScoreService>().Add(100);
 
 - **置くだけで動く** — 各サービスが Awake で自己登録するので、初期化スクリプトやシーン間の参照管理が不要
 - **呼び出し側はインターフェースだけ知っていればいい** — 実装クラスの名前も場所も気にしなくていい
-- **演出の差し替えが Inspector だけでできる** — ITransition を実装した別コンポーネントに差し替えるだけ。コード変更不要
+- **演出の差し替えが Inspector だけでできる** — TransitionBase を継承した別コンポーネントに差し替えるだけ。コード変更不要
 - **モジュール間の依存は常に core への一方通行** — モジュール同士は干渉しない
