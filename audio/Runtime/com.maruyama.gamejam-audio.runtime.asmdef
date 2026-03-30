@@ -1,0 +1,12 @@
+{
+  "name": "com.maruyama.gamejam-audio.runtime",
+  "rootNamespace": "GameJamAudio",
+  "references": [
+    "GUID:4da709e55248606d2dbd62440667468d",
+    "UniTask",
+    "UniTask.DOTween",
+    "DOTween.Modules"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}
