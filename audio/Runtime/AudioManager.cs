@@ -115,8 +115,8 @@ namespace GameJamAudio
 				return;
 			}
 
-			var source = _sePool[_sePoolIndex % _sePoolSize];
-			_sePoolIndex++;
+			var source = _sePool[_sePoolIndex];
+			_sePoolIndex = (_sePoolIndex + 1) % _sePoolSize;
 			source.PlayOneShot(data.Clip, data.Volume);
 		}
 
