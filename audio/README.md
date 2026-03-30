@@ -15,9 +15,9 @@ https://github.com/daiMaruyama/gamejam-framework.git?path=audio
 
 | パッケージ | 導入方法 |
 |-----------|---------|
-| UniTask | Package Manager → Add package from git URL:<br>`https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask` |
-| DOTween | Asset Store からインストール → Tools > Demigiant > DOTween Utility Panel で Setup |
-| core | `https://github.com/daiMaruyama/gamejam-framework.git?path=core` |
+| [UniTask](https://github.com/Cysharp/UniTask) | Package Manager → Add package from git URL → リポジトリの README 参照 |
+| [DOTween](https://dotween.demigiant.com) | Asset Store からインストール → Tools > Demigiant > DOTween Utility Panel で Setup |
+| core | Package Manager → Add package from git URL:<br>`https://github.com/daiMaruyama/gamejam-framework.git?path=core` |
 
 ## 最短セットアップ
 
@@ -54,7 +54,6 @@ ServiceLocator.Get<IAudioService>().PlaySE(seData);
 
 | 項目 | 説明 |
 |------|------|
-| Key | 識別キー（任意の文字列） |
 | Clip | 再生する AudioClip |
 | Volume | 音量（0〜1） |
 | Loop | ループ再生するか |
@@ -63,7 +62,6 @@ ServiceLocator.Get<IAudioService>().PlaySE(seData);
 
 | 項目 | 説明 |
 |------|------|
-| Key | 識別キー（任意の文字列） |
 | Clip | 再生する AudioClip |
 | Volume | 音量（0〜1） |
 

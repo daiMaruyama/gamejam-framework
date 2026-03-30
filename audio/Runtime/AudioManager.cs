@@ -16,7 +16,7 @@ namespace GameJamAudio
 		[SerializeField] private float _bgmFadeDuration = 0.5f;
 
 		/// <summary>SE 再生に使う AudioSource のプール数。</summary>
-		[SerializeField] private int _sePoolSize = 8;
+		[SerializeField, Min(1)] private int _sePoolSize = 8;
 
 		private AudioSource _bgmSource;
 		private AudioSource[] _sePool;

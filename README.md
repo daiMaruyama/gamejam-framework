@@ -31,8 +31,8 @@ ServiceLocator.Get<ISceneService>().LoadAsync("Title");
 
 | パッケージ | 導入方法 |
 |-----------|---------|
-| UniTask | Package Manager → Add package from git URL:<br>`https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask` |
-| DOTween | Asset Store からインストール → Tools > Demigiant > DOTween Utility Panel で Setup |
+| [UniTask](https://github.com/Cysharp/UniTask) | Package Manager → Add package from git URL → リポジトリの README 参照 |
+| [DOTween](https://dotween.demigiant.com) | Asset Store からインストール → Tools > Demigiant > DOTween Utility Panel で Setup |
 
 ### 2. フレームワークを入れる
 
