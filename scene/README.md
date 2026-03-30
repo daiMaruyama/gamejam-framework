@@ -3,6 +3,14 @@
 トランジション付きシーン遷移モジュール。
 SceneLoader をシーンに置くだけで、どこからでも1行で遷移できる。
 
+## 導入
+
+Package Manager → Add package from git URL:
+
+```
+https://github.com/daiMaruyama/gamejam-framework.git?path=scene
+```
+
 ## 前提パッケージ（先に導入すること）
 
 | パッケージ | 導入方法 |
