@@ -1,6 +1,6 @@
 # gamejam-framework
 
-ゲームジャム用の軽量フレームワーク。
+ゲームジャム用フレームワーク。
 必要なモジュールだけ Git URL で個別に導入できる。
 
 ## ServiceLocator とは
