@@ -31,6 +31,13 @@ namespace GameJamAudio
 				return;
 			}
 
+			if (_sePoolSize <= 0)
+			{
+				Debug.LogError($"[{GetType().Name}] sePoolSize は 1 以上にしてください。", this);
+				enabled = false;
+				return;
+			}
+
 			_bgmSource = gameObject.AddComponent<AudioSource>();
 			_bgmSource.loop = false;
 			_bgmSource.playOnAwake = false;
@@ -117,10 +124,17 @@ namespace GameJamAudio
 		{
 			_bgmTween?.Kill();
 
+			if (_bgmFadeDuration <= 0f)
+			{
+				_bgmSource.volume = targetVolume;
+				return UniTask.CompletedTask;
+			}
+
 			var tcs = new UniTaskCompletionSource();
 			_bgmTween = DOTween.To(() => _bgmSource.volume, v => _bgmSource.volume = v, targetVolume, _bgmFadeDuration)
 				.SetUpdate(true)
-				.OnComplete(() => tcs.TrySetResult());
+				.OnComplete(() => tcs.TrySetResult())
+				.OnKill(() => tcs.TrySetResult());
 
 			return tcs.Task;
 		}
