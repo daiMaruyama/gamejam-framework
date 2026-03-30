@@ -15,18 +15,11 @@ namespace GameJamScene
 		/// <summary>ITransition を実装した遷移コンポーネント。</summary>
 		[SerializeField] private TransitionBase _defaultTransitionComponent;
 
-		private ITransition _defaultTransition;
+		private TransitionBase _defaultTransition;
 		private bool _isLoading;
 
-		private static bool IsTransitionAlive(ITransition transition)
+		private static bool IsTransitionAlive(TransitionBase transition)
 		{
-			// ITransition can be implemented by non-Unity classes as well.
-			// For Unity objects, destroyed instances compare equal to null.
-			if (transition is Object unityObject)
-			{
-				return unityObject != null;
-			}
-
 			return transition != null;
 		}
 
@@ -72,7 +65,7 @@ namespace GameJamScene
 		/// transition を省略すると Inspector で設定したデフォルトトランジションを使う。
 		/// 読み込み中に呼ばれた場合は無視される。
 		/// </summary>
-		public async UniTask LoadAsync(string sceneName, ITransition transition = null)
+		public async UniTask LoadAsync(string sceneName, TransitionBase transition = null)
 		{
 			if (_isLoading)
 			{

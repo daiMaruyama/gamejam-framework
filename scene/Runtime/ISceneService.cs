@@ -8,6 +8,6 @@ namespace GameJamScene
 	/// </summary>
 	public interface ISceneService
 	{
-		UniTask LoadAsync(string sceneName, ITransition transition = null);
+		UniTask LoadAsync(string sceneName, TransitionBase transition = null);
 	}
 }

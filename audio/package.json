@@ -1,0 +1,19 @@
+{
+  "name": "com.maruyama.gamejam-audio",
+  "version": "0.1.0",
+  "displayName": "GameJam Audio",
+  "description": "BGM・SE 再生サービスモジュール。AudioManager をシーンに置くだけで ServiceLocator 経由で BGM/SE を制御できる。",
+  "unity": "6000.4",
+  "keywords": [
+    "gamejam",
+    "audio",
+    "bgm",
+    "se"
+  ],
+  "author": {
+    "name": "Maruyama"
+  },
+  "dependencies": {
+    "com.maruyama.gamejam-core": "0.1.0"
+  }
+}

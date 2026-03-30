@@ -10,7 +10,7 @@ namespace GameJamScene
 	/// Canvas 配下の RectTransform を持つ GameObject にアタッチすること。
 	/// </summary>
 	[RequireComponent(typeof(RectTransform))]
-	public abstract class TransitionBase : MonoBehaviour, ITransition
+	public abstract class TransitionBase : MonoBehaviour
 	{
 		[SerializeField] protected Color _color = Color.black;
 		[SerializeField] protected float _duration = 0.4f;
