@@ -12,6 +12,9 @@ namespace GameJamAudio
 	/// </summary>
 	public class AudioManager : MonoBehaviour, IAudioService
 	{
+		private const string BgmVolumeKey = "BGMVolume";
+		private const string SeVolumeKey = "SEVolume";
+
 		/// <summary>BGM のフェード時間（秒）。</summary>
 		[SerializeField] private float _bgmFadeDuration = 0.5f;
 
@@ -22,6 +25,12 @@ namespace GameJamAudio
 		private AudioSource[] _sePool;
 		private int _sePoolIndex;
 		private Tweener _bgmTween;
+		private float _bgmVolume;
+		private float _seVolume;
+		private BGMData _currentBGMData;
+
+		public float BGMVolume => _bgmVolume;
+		public float SEVolume => _seVolume;
 
 		private void Awake()
 		{
@@ -38,9 +47,13 @@ namespace GameJamAudio
 				return;
 			}
 
+			_bgmVolume = PlayerPrefs.GetFloat(BgmVolumeKey, 1f);
+			_seVolume = PlayerPrefs.GetFloat(SeVolumeKey, 1f);
+
 			_bgmSource = gameObject.AddComponent<AudioSource>();
 			_bgmSource.loop = false;
 			_bgmSource.playOnAwake = false;
+			_bgmSource.volume = _bgmVolume;
 
 			_sePool = new AudioSource[_sePoolSize];
 
@@ -82,12 +95,13 @@ namespace GameJamAudio
 				_bgmSource.Stop();
 			}
 
+			_currentBGMData = data;
 			_bgmSource.clip = data.Clip;
 			_bgmSource.loop = data.Loop;
 			_bgmSource.volume = 0f;
 			_bgmSource.Play();
 
-			await FadeBGMAsync(data.Volume);
+			await FadeBGMAsync(data.Volume * _bgmVolume);
 		}
 
 		/// <summary>
@@ -102,6 +116,7 @@ namespace GameJamAudio
 
 			await FadeBGMAsync(0f);
 			_bgmSource.Stop();
+			_currentBGMData = null;
 		}
 
 		/// <summary>
@@ -117,7 +132,26 @@ namespace GameJamAudio
 
 			var source = _sePool[_sePoolIndex];
 			_sePoolIndex = (_sePoolIndex + 1) % _sePoolSize;
-			source.PlayOneShot(data.Clip, data.Volume);
+			source.PlayOneShot(data.Clip, data.Volume * _seVolume);
+		}
+
+		/// <summary>
+		/// BGM の音量を設定して PlayerPrefs に保存する。
+		/// </summary>
+		public void SetBGMVolume(float volume)
+		{
+			_bgmVolume = Mathf.Clamp01(volume);
+			_bgmSource.volume = _currentBGMData != null ? _currentBGMData.Volume * _bgmVolume : _bgmVolume;
+			PlayerPrefs.SetFloat(BgmVolumeKey, _bgmVolume);
+		}
+
+		/// <summary>
+		/// SE の音量を設定して PlayerPrefs に保存する。
+		/// </summary>
+		public void SetSEVolume(float volume)
+		{
+			_seVolume = Mathf.Clamp01(volume);
+			PlayerPrefs.SetFloat(SeVolumeKey, _seVolume);
 		}
 
 		private UniTask FadeBGMAsync(float targetVolume)
