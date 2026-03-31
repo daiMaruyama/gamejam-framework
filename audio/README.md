@@ -2,6 +2,7 @@
 
 BGM・SE 再生サービスモジュール。
 AudioManager をシーンに置くだけで、どこからでも1行で BGM/SE を制御できる。
+音量スライダーコンポーネント付き（PlayerPrefs 自動保存）。
 
 ## 導入
 
@@ -39,14 +40,43 @@ await ServiceLocator.Get<IAudioService>().StopBGMAsync();
 
 // SE 再生
 ServiceLocator.Get<IAudioService>().PlaySE(seData);
+
+// 音量変更（0〜1）
+ServiceLocator.Get<IAudioService>().SetBGMVolume(0.8f);
+ServiceLocator.Get<IAudioService>().SetSEVolume(0.5f);
 ```
 
-## Inspector 項目（AudioManager）
+## 音量スライダー
+
+`BGMVolumeSlider` / `SEVolumeSlider` をアタッチして fillAmount 式の Image をアサインするだけで動作する。
+
+```
+Canvas
+└── SliderRoot (BGMVolumeSlider または SEVolumeSlider をアタッチ)
+    └── FillImage (Image・fillMethod: Horizontal)
+        ← Fill Image に アサイン
+```
+
+- 起動時に PlayerPrefs から音量を自動ロードして fillAmount に反映
+- クリック・ドラッグで音量操作
+- fillAmount が DOTween でスムーズにアニメーション
+- 音量変更は PlayerPrefs に自動保存
+
+## Inspector 項目
+
+### AudioManager
 
 | 項目 | 説明 | デフォルト |
 |------|------|-----------|
 | BGM Fade Duration | BGM のフェード時間（秒） | 0.5 |
 | SE Pool Size | SE 用 AudioSource のプール数 | 8 |
+
+### BGMVolumeSlider / SEVolumeSlider
+
+| 項目 | 説明 | デフォルト |
+|------|------|-----------|
+| Fill Image | fillAmount を操作する Image | — |
+| Anim Duration | 音量変化アニメーションの時間（秒） | 0.1 |
 
 ## データアセット
 
