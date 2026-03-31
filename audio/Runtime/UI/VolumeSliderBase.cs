@@ -17,8 +17,12 @@ namespace GameJamAudio
 		/// <summary>fillAmount で音量を表示する Image。</summary>
 		[SerializeField] private Image _fillImage;
 
-		/// <summary>音量に合わせて横移動するハンドル。省略可能。</summary>
-		[SerializeField] private RectTransform _handleRect;
+		/// <summary>
+		/// 音量に合わせて横移動するハンドル。省略可能。
+		/// Pivot.x = 0.5、Anchor は Fill Image の左端に合わせること。
+		/// </summary>
+		[SerializeField, Tooltip("Pivot.x=0.5, anchored to fill rect's left edge")]
+		private RectTransform _handleRect;
 
 		/// <summary>音量変化アニメーションの時間（秒）。</summary>
 		[SerializeField] private float _animDuration = 0.1f;
@@ -91,19 +95,20 @@ namespace GameJamAudio
 
 			if (animate)
 			{
-				_fillImage.DOFillAmount(value, _animDuration).SetUpdate(true);
+				_fillImage.DOFillAmount(value, _animDuration)
+					.SetUpdate(true)
+					.OnUpdate(() => UpdateHandle(_fillImage.fillAmount));
 			}
 			else
 			{
 				_fillImage.fillAmount = value;
+				UpdateHandle(value);
 			}
-
-			UpdateHandle(value);
 		}
 
 		private void UpdateHandle(float value)
 		{
-			if (_handleRect == null)
+			if (_handleRect == null || _fillRect == null)
 			{
 				return;
 			}
