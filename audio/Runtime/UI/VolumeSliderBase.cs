@@ -9,12 +9,20 @@ namespace GameJamAudio
 	/// <summary>
 	/// 音量スライダーの基底クラス。
 	/// FillAmount 式の Image をアサインするだけで動作する。
+	/// Handle は省略可能。アサインすると音量に合わせてつまみが横移動する。
 	/// Canvas 配下の GameObject にアタッチすること。
 	/// </summary>
 	public abstract class VolumeSliderBase : MonoBehaviour, IPointerDownHandler, IDragHandler
 	{
 		/// <summary>fillAmount で音量を表示する Image。</summary>
 		[SerializeField] private Image _fillImage;
+
+		/// <summary>
+		/// 音量に合わせて横移動するハンドル。省略可能。
+		/// Pivot.x = 0.5、Anchor は Fill Image の左端に合わせること。
+		/// </summary>
+		[SerializeField, Tooltip("Pivot.x=0.5, anchored to fill rect's left edge")]
+		private RectTransform _handleRect;
 
 		/// <summary>音量変化アニメーションの時間（秒）。</summary>
 		[SerializeField] private float _animDuration = 0.1f;
@@ -87,12 +95,26 @@ namespace GameJamAudio
 
 			if (animate)
 			{
-				_fillImage.DOFillAmount(value, _animDuration).SetUpdate(true);
+				_fillImage.DOFillAmount(value, _animDuration)
+					.SetUpdate(true)
+					.OnUpdate(() => UpdateHandle(_fillImage.fillAmount));
 			}
 			else
 			{
 				_fillImage.fillAmount = value;
+				UpdateHandle(value);
 			}
+		}
+
+		private void UpdateHandle(float value)
+		{
+			if (_handleRect == null || _fillRect == null)
+			{
+				return;
+			}
+
+			var x = _fillRect.rect.width * Mathf.Clamp01(value);
+			_handleRect.anchoredPosition = new Vector2(x, _handleRect.anchoredPosition.y);
 		}
 	}
 }
