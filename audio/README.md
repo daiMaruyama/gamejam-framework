@@ -50,11 +50,11 @@ ServiceLocator.Get<IAudioService>().SetSEVolume(0.5f);
 
 `BGMVolumeSlider` / `SEVolumeSlider` をアタッチして fillAmount 式の Image をアサインするだけで動作する。
 
-```
+```text
 Canvas
 └── SliderRoot (BGMVolumeSlider または SEVolumeSlider をアタッチ)
     └── FillImage (Image・fillMethod: Horizontal)
-        ← Fill Image に アサイン
+        ← Fill Image にアサイン
 ```
 
 - 起動時に PlayerPrefs から音量を自動ロードして fillAmount に反映

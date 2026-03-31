@@ -27,6 +27,7 @@ namespace GameJamAudio
 		private Tweener _bgmTween;
 		private float _bgmVolume;
 		private float _seVolume;
+		private BGMData _currentBGMData;
 
 		public float BGMVolume => _bgmVolume;
 		public float SEVolume => _seVolume;
@@ -94,6 +95,7 @@ namespace GameJamAudio
 				_bgmSource.Stop();
 			}
 
+			_currentBGMData = data;
 			_bgmSource.clip = data.Clip;
 			_bgmSource.loop = data.Loop;
 			_bgmSource.volume = 0f;
@@ -114,6 +116,7 @@ namespace GameJamAudio
 
 			await FadeBGMAsync(0f);
 			_bgmSource.Stop();
+			_currentBGMData = null;
 		}
 
 		/// <summary>
@@ -138,7 +141,7 @@ namespace GameJamAudio
 		public void SetBGMVolume(float volume)
 		{
 			_bgmVolume = Mathf.Clamp01(volume);
-			_bgmSource.volume = _bgmVolume;
+			_bgmSource.volume = _currentBGMData != null ? _currentBGMData.Volume * _bgmVolume : _bgmVolume;
 			PlayerPrefs.SetFloat(BgmVolumeKey, _bgmVolume);
 		}
 
