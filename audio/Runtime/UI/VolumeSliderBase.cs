@@ -113,7 +113,7 @@ namespace GameJamAudio
 				return;
 			}
 
-			var x = _fillRect.rect.width * value;
+			var x = _fillRect.rect.width * Mathf.Clamp01(value);
 			_handleRect.anchoredPosition = new Vector2(x, _handleRect.anchoredPosition.y);
 		}
 	}
