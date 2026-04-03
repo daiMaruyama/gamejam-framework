@@ -1,0 +1,46 @@
+# GameJam Title
+
+タイトル画面の基盤モジュール。
+`TitleManager` をアタッチするだけでアイドルタイマー・オープニング演出・シーン遷移が動く。
+
+## 導入
+
+Package Manager → Add package from git URL:
+
+```text
+https://github.com/daiMaruyama/gamejam-framework.git?path=title
+```
+
+## 前提パッケージ（先に導入すること）
+
+| パッケージ | 導入方法 |
+|-----------|---------|
+| [UniTask](https://github.com/Cysharp/UniTask) | Package Manager → Add package from git URL → リポジトリの README 参照 |
+| [DOTween](https://dotween.demigiant.com) | Asset Store からインストール → Tools > Demigiant > DOTween Utility Panel で Setup |
+| core | `https://github.com/daiMaruyama/gamejam-framework.git?path=core` |
+| scene | `https://github.com/daiMaruyama/gamejam-framework.git?path=scene`（任意） |
+
+## セットアップ
+
+1. タイトルシーンの GameObject に `TitleManager` をアタッチ
+2. Inspector で各項目を設定
+3. オープニング演出用の CanvasGroup を用意してアサイン（省略可）
+
+## Inspector 項目
+
+| 項目 | 説明 | デフォルト |
+|------|------|-----------|
+| Idle Time Limit | アイドルと判定するまでの時間（秒） | 10 |
+| Opening Canvas Group | オープニング演出の CanvasGroup（省略可） | — |
+| Fade Duration | フェードイン/アウトの時間（秒） | 0.5 |
+| Next Scene Name | ゲーム開始時に遷移するシーン名 | Game |
+
+## 動作
+
+| 状態 | 操作 | 結果 |
+|------|------|------|
+| 待機中 | 何もしない | 一定時間後にオープニング演出フェードイン |
+| 待機中 | キー入力 | ゲームシーンへ遷移 |
+| オープニング再生中 | キー入力 | オープニングをフェードアウトして待機状態に戻る |
+
+scene モジュールが導入されていれば `LoadAsync` でトランジション付き遷移、なければ `SceneManager.LoadScene` で即時遷移する。

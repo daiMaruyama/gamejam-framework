@@ -1,0 +1,13 @@
+{
+  "name": "com.maruyama.gamejam-title.runtime",
+  "rootNamespace": "GameJamTitle",
+  "references": [
+    "GUID:4da709e55248606d2dbd62440667468d",
+    "GUID:982a4c23e2db5e85b7368189154f14dd",
+    "UniTask",
+    "UniTask.DOTween",
+    "DOTween.Modules"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}
