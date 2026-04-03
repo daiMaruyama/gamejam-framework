@@ -120,6 +120,8 @@ namespace GameJamTitle
 
 		private void OnSkip()
 		{
+			_idleTimer = 0f;
+
 			if (!_isPlaying) return;
 
 			StopVideo();
@@ -154,7 +156,10 @@ namespace GameJamTitle
 		private void StopVideo()
 		{
 			Interlocked.Increment(ref _playGeneration);
-			_videoPlayer?.Stop();
+			if (_videoPlayer != null)
+			{
+				_videoPlayer.Stop();
+			}
 
 			if (_fadeCanvasGroup != null)
 			{
