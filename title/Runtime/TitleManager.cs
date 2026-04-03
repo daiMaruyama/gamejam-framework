@@ -29,6 +29,10 @@ namespace GameJamTitle
 		/// <summary>フェードイン/アウトの時間（秒）。</summary>
 		[SerializeField] private float _fadeDuration = 0.5f;
 
+		[Header("動画再生中に非表示にするUI")]
+		/// <summary>動画再生中に非表示にする GameObject。停止時に再表示する。</summary>
+		[SerializeField] private GameObject[] _hideOnPlay;
+
 		[Header("入力設定")]
 		/// <summary>
 		/// 動画スキップに使う InputAction。
@@ -138,22 +142,31 @@ namespace GameJamTitle
 			}
 
 			_isPlaying = true;
+			SetHideOnPlay(false);
 			var gen = Interlocked.Increment(ref _playGeneration);
 
-			if (_fadeCanvasGroup != null)
+			try
 			{
-				_fadeCanvasGroup.blocksRaycasts = true;
-				_fadeCanvasGroup.interactable = true;
-				await _fadeCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
-				if (gen != _playGeneration) return;
+				if (_fadeCanvasGroup != null)
+				{
+					_fadeCanvasGroup.blocksRaycasts = true;
+					_fadeCanvasGroup.interactable = true;
+					await _fadeCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+					if (gen != _playGeneration) return;
+				}
+
+				_videoPlayer.Play();
+
+				if (_fadeCanvasGroup != null)
+				{
+					await _fadeCanvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+					if (gen != _playGeneration) return;
+				}
 			}
-
-			_videoPlayer.Play();
-
-			if (_fadeCanvasGroup != null)
+			catch (Exception e)
 			{
-				await _fadeCanvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
-				if (gen != _playGeneration) return;
+				Debug.LogException(e, this);
+				StopVideo();
 			}
 		}
 
@@ -175,6 +188,20 @@ namespace GameJamTitle
 
 			_isPlaying = false;
 			_idleTimer = 0f;
+			SetHideOnPlay(true);
+		}
+
+		private void SetHideOnPlay(bool active)
+		{
+			if (_hideOnPlay == null) return;
+
+			foreach (var go in _hideOnPlay)
+			{
+				if (go != null)
+				{
+					go.SetActive(active);
+				}
+			}
 		}
 	}
 }
