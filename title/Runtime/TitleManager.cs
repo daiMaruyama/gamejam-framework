@@ -1,55 +1,60 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.Video;
 
 namespace GameJamTitle
 {
 	/// <summary>
 	/// タイトル画面の基盤コンポーネント。
-	/// アイドルタイマーとオープニング演出を管理し、スタート入力時に UnityEvent を発火する。
+	/// アイドル一定時間で動画を再生し、入力で止める。
 	/// タイトルシーンの GameObject にアタッチして使う。
 	/// </summary>
 	public class TitleManager : MonoBehaviour
 	{
 		[Header("アイドル設定")]
-		/// <summary>この秒数操作がないとオープニング演出を再生する。</summary>
+		/// <summary>この秒数操作がないと動画を再生する。</summary>
 		[SerializeField] private float _idleTimeLimit = 10f;
 
-		[Header("オープニング演出")]
-		/// <summary>オープニング演出の CanvasGroup。省略するとアイドル後も通常待機を継続する。</summary>
-		[SerializeField] private CanvasGroup _openingCanvasGroup;
+		[Header("動画")]
+		/// <summary>アイドル時に再生する VideoPlayer。</summary>
+		[SerializeField] private VideoPlayer _videoPlayer;
+
+		[Header("フェード（任意）")]
+		/// <summary>動画の前後にフェードをかける CanvasGroup。省略するとフェードなしで即再生。</summary>
+		[SerializeField] private CanvasGroup _fadeCanvasGroup;
 
 		/// <summary>フェードイン/アウトの時間（秒）。</summary>
 		[SerializeField] private float _fadeDuration = 0.5f;
 
-		[Header("イベント")]
-		/// <summary>スタート入力時に発火するイベント。シーン遷移など外部処理を接続する。</summary>
-		[SerializeField] private UnityEvent _onStartRequested;
-
 		[Header("入力設定")]
 		/// <summary>
-		/// ゲーム開始・オープニングキャンセルに使う InputAction。
+		/// 動画スキップに使う InputAction。
 		/// 未アサインの場合はキーボード Space・Enter・ゲームパッド South を使う。
 		/// </summary>
-		[SerializeField] private InputActionReference _startAction;
+		[SerializeField] private InputActionReference _skipAction;
 
 		private float _idleTimer;
-		private bool _hasStarted;
+		private bool _isPlaying;
 		private InputAction _action;
 		private Action<InputAction.CallbackContext> _onPerformed;
+		private VideoPlayer.EventHandler _onLoopPointReached;
 
 		private void OnEnable()
 		{
-			_hasStarted = false;
-
-			if (_startAction != null)
+			if (_videoPlayer != null)
 			{
-				_action = _startAction.action;
+				_onLoopPointReached = _ => StopVideo();
+				_videoPlayer.loopPointReached += _onLoopPointReached;
+			}
+
+			if (_skipAction != null)
+			{
+				_action = _skipAction.action;
 				if (_action == null)
 				{
-					Debug.LogError($"[TitleManager] {_startAction.name} の action が null です。InputActionAsset を確認してください。");
+					Debug.LogError($"[TitleManager] {_skipAction.name} の action が null です。InputActionAsset を確認してください。");
 					return;
 				}
 			}
@@ -61,13 +66,18 @@ namespace GameJamTitle
 				_action.AddBinding("<Gamepad>/buttonSouth");
 			}
 
-			_onPerformed = _ => OnInput();
+			_onPerformed = _ => OnSkip();
 			_action.performed += _onPerformed;
 			_action.Enable();
 		}
 
 		private void OnDisable()
 		{
+			if (_videoPlayer != null)
+			{
+				_videoPlayer.loopPointReached -= _onLoopPointReached;
+			}
+
 			if (_action == null)
 			{
 				return;
@@ -76,7 +86,7 @@ namespace GameJamTitle
 			_action.performed -= _onPerformed;
 			_action.Disable();
 
-			if (_startAction == null)
+			if (_skipAction == null)
 			{
 				_action.Dispose();
 			}
@@ -84,54 +94,67 @@ namespace GameJamTitle
 
 		private void Start()
 		{
-			if (_openingCanvasGroup != null)
+			if (_fadeCanvasGroup != null)
 			{
-				_openingCanvasGroup.alpha = 0f;
-				_openingCanvasGroup.gameObject.SetActive(false);
+				_fadeCanvasGroup.alpha = 0f;
 			}
 		}
 
 		private void Update()
 		{
-			if (_hasStarted) return;
-			if (_openingCanvasGroup != null && _openingCanvasGroup.gameObject.activeSelf) return;
+			if (_isPlaying) return;
 
 			_idleTimer += Time.deltaTime;
 
 			if (_idleTimer >= _idleTimeLimit)
 			{
 				_idleTimer = 0f;
-
-				if (_openingCanvasGroup != null)
-				{
-					PlayOpening();
-				}
+				PlayAsync();
 			}
 		}
 
-		private void OnInput()
+		private void OnSkip()
 		{
-			if (_hasStarted) return;
+			if (!_isPlaying) return;
 
-			_hasStarted = true;
+			StopVideo();
+		}
 
-			if (_openingCanvasGroup != null)
+		private async void PlayAsync()
+		{
+			if (_videoPlayer == null)
 			{
-				_openingCanvasGroup.DOKill();
-				_openingCanvasGroup.gameObject.SetActive(false);
+				Debug.LogWarning("[TitleManager] VideoPlayer が未設定です。", this);
+				return;
 			}
 
-			_onStartRequested?.Invoke();
+			_isPlaying = true;
+
+			if (_fadeCanvasGroup != null)
+			{
+				await _fadeCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+			}
+
+			_videoPlayer?.Play();
+
+			if (_fadeCanvasGroup != null)
+			{
+				await _fadeCanvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+			}
 		}
 
-		/// <summary>
-		/// オープニング演出をフェードインで再生する。
-		/// </summary>
-		private void PlayOpening()
+		private void StopVideo()
 		{
-			_openingCanvasGroup.alpha = 0f;
-			_openingCanvasGroup.gameObject.SetActive(true);
-			_openingCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true);
+			_videoPlayer?.Stop();
+
+			if (_fadeCanvasGroup != null)
+			{
+				_fadeCanvasGroup.DOKill();
+				_fadeCanvasGroup.alpha = 0f;
+			}
+
+			_isPlaying = false;
+			_idleTimer = 0f;
 		}
 	}
 }
