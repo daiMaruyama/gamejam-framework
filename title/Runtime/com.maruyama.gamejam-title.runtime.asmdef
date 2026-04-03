@@ -3,8 +3,6 @@
   "rootNamespace": "GameJamTitle",
   "references": [
     "Unity.InputSystem",
-    "UniTask",
-    "UniTask.DOTween",
     "DOTween.Modules"
   ],
   "includePlatforms": [],

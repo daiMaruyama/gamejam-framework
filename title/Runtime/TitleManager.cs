@@ -1,5 +1,4 @@
 using System;
-using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
@@ -37,8 +36,6 @@ namespace GameJamTitle
 		[SerializeField] private InputActionReference _startAction;
 
 		private float _idleTimer;
-		private bool _isOpeningPlaying;
-		private bool _isStoppingOpening;
 		private bool _hasStarted;
 		private InputAction _action;
 		private Action<InputAction.CallbackContext> _onPerformed;
@@ -52,6 +49,7 @@ namespace GameJamTitle
 				_action = _startAction.action;
 				if (_action == null)
 				{
+					Debug.LogError($"[TitleManager] {_startAction.name} の action が null です。InputActionAsset を確認してください。");
 					return;
 				}
 			}
@@ -95,10 +93,8 @@ namespace GameJamTitle
 
 		private void Update()
 		{
-			if (_isOpeningPlaying)
-			{
-				return;
-			}
+			if (_hasStarted) return;
+			if (_openingCanvasGroup != null && _openingCanvasGroup.gameObject.activeSelf) return;
 
 			_idleTimer += Time.deltaTime;
 
@@ -108,53 +104,34 @@ namespace GameJamTitle
 
 				if (_openingCanvasGroup != null)
 				{
-					PlayOpeningAsync().Forget();
+					PlayOpening();
 				}
 			}
 		}
 
 		private void OnInput()
 		{
-			if (_isStoppingOpening || _hasStarted)
+			if (_hasStarted) return;
+
+			_hasStarted = true;
+
+			if (_openingCanvasGroup != null)
 			{
-				return;
+				_openingCanvasGroup.DOKill();
+				_openingCanvasGroup.gameObject.SetActive(false);
 			}
 
-			_idleTimer = 0f;
-
-			if (_isOpeningPlaying)
-			{
-				StopOpeningAsync().Forget();
-			}
-			else
-			{
-				_hasStarted = true;
-				_onStartRequested?.Invoke();
-			}
+			_onStartRequested?.Invoke();
 		}
 
 		/// <summary>
 		/// オープニング演出をフェードインで再生する。
 		/// </summary>
-		private async UniTaskVoid PlayOpeningAsync()
+		private void PlayOpening()
 		{
-			_isOpeningPlaying = true;
+			_openingCanvasGroup.alpha = 0f;
 			_openingCanvasGroup.gameObject.SetActive(true);
-			_openingCanvasGroup.DOKill();
-			await _openingCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true).ToUniTask();
-		}
-
-		/// <summary>
-		/// オープニング演出をフェードアウトで停止する。
-		/// </summary>
-		private async UniTaskVoid StopOpeningAsync()
-		{
-			_isStoppingOpening = true;
-			_openingCanvasGroup.DOKill();
-			await _openingCanvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true).ToUniTask();
-			_openingCanvasGroup.gameObject.SetActive(false);
-			_isOpeningPlaying = false;
-			_isStoppingOpening = false;
+			_openingCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true);
 		}
 	}
 }
