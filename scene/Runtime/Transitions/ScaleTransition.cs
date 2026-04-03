@@ -6,8 +6,8 @@ using UnityEngine.UI;
 namespace GameJamScene
 {
 	/// <summary>
-	/// アタッチした GameObject をスケールアニメーションで拡縮するトランジション。
-	/// Play() でゼロに縮み、Release() で元のスケールに戻る。
+	/// 子オブジェクトをスケールアニメーションで拡縮するトランジション。
+	/// Play() でゼロからフルスケールに拡大して画面を覆い、Release() でゼロに縮小して開く。
 	/// 空の GameObject にアタッチするだけで動作する。
 	/// </summary>
 	public class ScaleTransition : TransitionBase
