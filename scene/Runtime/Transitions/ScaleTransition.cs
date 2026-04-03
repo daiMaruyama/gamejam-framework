@@ -12,22 +12,38 @@ namespace GameJamScene
 	/// </summary>
 	public class ScaleTransition : TransitionBase
 	{
-		private Vector3 _defaultScale;
+		private Transform _scaleTarget;
 		private Image _blocker;
 
 		private void Awake()
 		{
-			_defaultScale = transform.localScale;
-
+			// ブロッカーは親（このオブジェクト）に置く。スケールの影響を受けない。
 			_blocker = gameObject.AddComponent<Image>();
 			_blocker.color = Color.clear;
 			_blocker.raycastTarget = false;
+
+			// スケールさせる子を作る。
+			var go = new GameObject("ScaleTarget");
+			go.transform.SetParent(transform, false);
+
+			var overlay = go.AddComponent<Image>();
+			overlay.color = _color;
+			overlay.raycastTarget = false;
+
+			var rt = overlay.rectTransform;
+			rt.anchorMin = Vector2.zero;
+			rt.anchorMax = Vector2.one;
+			rt.offsetMin = Vector2.zero;
+			rt.offsetMax = Vector2.zero;
+
+			_scaleTarget = go.transform;
+			_scaleTarget.localScale = Vector3.zero;
 
 			_isInitialized = true;
 		}
 
 		/// <summary>
-		/// GameObject をスケールダウンして画面を切り替える準備をする。
+		/// 子オブジェクトをスケールアップして画面を覆う。
 		/// </summary>
 		public override async UniTask Play()
 		{
@@ -37,12 +53,12 @@ namespace GameJamScene
 			}
 
 			_blocker.raycastTarget = true;
-			await transform.DOScale(Vector3.zero, _duration)
+			await _scaleTarget.DOScale(Vector3.one, _duration)
 				.SetEase(_easeIn).SetUpdate(true).ToUniTask();
 		}
 
 		/// <summary>
-		/// GameObject を元のスケールに戻す。
+		/// 子オブジェクトをスケールダウンして画面を開く。
 		/// </summary>
 		public override async UniTask Release()
 		{
@@ -51,7 +67,7 @@ namespace GameJamScene
 				return;
 			}
 
-			await transform.DOScale(_defaultScale, _duration)
+			await _scaleTarget.DOScale(Vector3.zero, _duration)
 				.SetEase(_easeOut).SetUpdate(true).ToUniTask();
 			_blocker.raycastTarget = false;
 		}
