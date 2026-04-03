@@ -46,6 +46,7 @@ SceneLoader (空の GameObject)
 | `StripeTransition` | 短冊が時間差で波状にスケールイン | stripeCount, stagger |
 | `GridTransition` | タイルが中心から外側へポップイン | columns, rows, stagger |
 | `DoorTransition` | 左右パネルがドアのように開閉 | — |
+| `ScaleTransition` | GameObject がスケールダウン→スケールアップ | — |
 
 ### 共通 Inspector 項目（TransitionBase）
 
