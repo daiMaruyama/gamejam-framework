@@ -1,16 +1,15 @@
+using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using GameJamCore;
-using GameJamScene;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 namespace GameJamTitle
 {
 	/// <summary>
 	/// タイトル画面の基盤コンポーネント。
-	/// アイドルタイマー・オープニング演出・シーン遷移をまとめて管理する。
+	/// アイドルタイマーとオープニング演出を管理し、スタート入力時に UnityEvent を発火する。
 	/// タイトルシーンの GameObject にアタッチして使う。
 	/// </summary>
 	public class TitleManager : MonoBehaviour
@@ -26,9 +25,9 @@ namespace GameJamTitle
 		/// <summary>フェードイン/アウトの時間（秒）。</summary>
 		[SerializeField] private float _fadeDuration = 0.5f;
 
-		[Header("シーン遷移")]
-		/// <summary>ゲーム開始時に遷移するシーン名。</summary>
-		[SerializeField] private string _nextSceneName = "InGame";
+		[Header("イベント")]
+		/// <summary>スタート入力時に発火するイベント。シーン遷移など外部処理を接続する。</summary>
+		[SerializeField] private UnityEvent _onStartRequested;
 
 		[Header("入力設定")]
 		/// <summary>
@@ -39,15 +38,22 @@ namespace GameJamTitle
 
 		private float _idleTimer;
 		private bool _isOpeningPlaying;
-		private bool _isTransitioning;
 		private bool _isStoppingOpening;
+		private bool _hasStarted;
 		private InputAction _action;
+		private Action<InputAction.CallbackContext> _onPerformed;
 
 		private void OnEnable()
 		{
+			_hasStarted = false;
+
 			if (_startAction != null)
 			{
 				_action = _startAction.action;
+				if (_action == null)
+				{
+					return;
+				}
 			}
 			else
 			{
@@ -57,13 +63,19 @@ namespace GameJamTitle
 				_action.AddBinding("<Gamepad>/buttonSouth");
 			}
 
-			_action.performed += _ => OnInput();
+			_onPerformed = _ => OnInput();
+			_action.performed += _onPerformed;
 			_action.Enable();
 		}
 
 		private void OnDisable()
 		{
-			_action.performed -= _ => OnInput();
+			if (_action == null)
+			{
+				return;
+			}
+
+			_action.performed -= _onPerformed;
 			_action.Disable();
 
 			if (_startAction == null)
@@ -83,7 +95,7 @@ namespace GameJamTitle
 
 		private void Update()
 		{
-			if (_isTransitioning || _isOpeningPlaying)
+			if (_isOpeningPlaying)
 			{
 				return;
 			}
@@ -103,7 +115,7 @@ namespace GameJamTitle
 
 		private void OnInput()
 		{
-			if (_isTransitioning || _isStoppingOpening)
+			if (_isStoppingOpening || _hasStarted)
 			{
 				return;
 			}
@@ -116,7 +128,8 @@ namespace GameJamTitle
 			}
 			else
 			{
-				StartGameAsync().Forget();
+				_hasStarted = true;
+				_onStartRequested?.Invoke();
 			}
 		}
 
@@ -127,6 +140,7 @@ namespace GameJamTitle
 		{
 			_isOpeningPlaying = true;
 			_openingCanvasGroup.gameObject.SetActive(true);
+			_openingCanvasGroup.DOKill();
 			await _openingCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true).ToUniTask();
 		}
 
@@ -136,34 +150,11 @@ namespace GameJamTitle
 		private async UniTaskVoid StopOpeningAsync()
 		{
 			_isStoppingOpening = true;
+			_openingCanvasGroup.DOKill();
 			await _openingCanvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true).ToUniTask();
 			_openingCanvasGroup.gameObject.SetActive(false);
 			_isOpeningPlaying = false;
 			_isStoppingOpening = false;
-		}
-
-		/// <summary>
-		/// ゲームシーンへ遷移する。ISceneService があればトランジション付きで遷移する。
-		/// </summary>
-		private async UniTaskVoid StartGameAsync()
-		{
-			_isTransitioning = true;
-
-			try
-			{
-				if (ServiceLocator.TryGet<ISceneService>(out var scene))
-				{
-					await scene.LoadAsync(_nextSceneName);
-				}
-				else
-				{
-					SceneManager.LoadScene(_nextSceneName);
-				}
-			}
-			finally
-			{
-				_isTransitioning = false;
-			}
 		}
 	}
 }
