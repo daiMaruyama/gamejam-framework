@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -31,12 +32,13 @@ namespace GameJamTitle
 		[Header("入力設定")]
 		/// <summary>
 		/// 動画スキップに使う InputAction。
-		/// 未アサインの場合はキーボード Space・Enter・ゲームパッド South を使う。
+		/// 未アサインの場合はマウス左クリック・キーボード Space・Enter・ゲームパッド South を使う。
 		/// </summary>
 		[SerializeField] private InputActionReference _skipAction;
 
 		private float _idleTimer;
 		private bool _isPlaying;
+		private int _playGeneration;
 		private InputAction _action;
 		private Action<InputAction.CallbackContext> _onPerformed;
 		private VideoPlayer.EventHandler _onLoopPointReached;
@@ -61,6 +63,7 @@ namespace GameJamTitle
 			else
 			{
 				_action = new InputAction();
+				_action.AddBinding("<Mouse>/leftButton");
 				_action.AddBinding("<Keyboard>/space");
 				_action.AddBinding("<Keyboard>/enter");
 				_action.AddBinding("<Gamepad>/buttonSouth");
@@ -73,6 +76,8 @@ namespace GameJamTitle
 
 		private void OnDisable()
 		{
+			StopVideo();
+
 			if (_videoPlayer != null)
 			{
 				_videoPlayer.loopPointReached -= _onLoopPointReached;
@@ -129,22 +134,26 @@ namespace GameJamTitle
 			}
 
 			_isPlaying = true;
+			var gen = Interlocked.Increment(ref _playGeneration);
 
 			if (_fadeCanvasGroup != null)
 			{
 				await _fadeCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+				if (gen != _playGeneration) return;
 			}
 
-			_videoPlayer?.Play();
+			_videoPlayer.Play();
 
 			if (_fadeCanvasGroup != null)
 			{
 				await _fadeCanvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+				if (gen != _playGeneration) return;
 			}
 		}
 
 		private void StopVideo()
 		{
+			Interlocked.Increment(ref _playGeneration);
 			_videoPlayer?.Stop();
 
 			if (_fadeCanvasGroup != null)
