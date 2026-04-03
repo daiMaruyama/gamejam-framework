@@ -102,6 +102,8 @@ namespace GameJamTitle
 			if (_fadeCanvasGroup != null)
 			{
 				_fadeCanvasGroup.alpha = 0f;
+				_fadeCanvasGroup.blocksRaycasts = false;
+				_fadeCanvasGroup.interactable = false;
 			}
 		}
 
@@ -140,6 +142,8 @@ namespace GameJamTitle
 
 			if (_fadeCanvasGroup != null)
 			{
+				_fadeCanvasGroup.blocksRaycasts = true;
+				_fadeCanvasGroup.interactable = true;
 				await _fadeCanvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
 				if (gen != _playGeneration) return;
 			}
@@ -165,6 +169,8 @@ namespace GameJamTitle
 			{
 				_fadeCanvasGroup.DOKill();
 				_fadeCanvasGroup.alpha = 0f;
+				_fadeCanvasGroup.blocksRaycasts = false;
+				_fadeCanvasGroup.interactable = false;
 			}
 
 			_isPlaying = false;
