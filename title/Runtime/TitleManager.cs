@@ -46,6 +46,7 @@ namespace GameJamTitle
 		private InputAction _action;
 		private Action<InputAction.CallbackContext> _onPerformed;
 		private VideoPlayer.EventHandler _onLoopPointReached;
+		private bool[] _hideOnPlayCache;
 
 		private void OnEnable()
 		{
@@ -124,6 +125,14 @@ namespace GameJamTitle
 			}
 		}
 
+		/// <summary>
+		/// アイドルタイマーをリセットする。外部UIなどから呼び出して操作中の動画再生を防ぐ。
+		/// </summary>
+		public void NotifyActivity()
+		{
+			_idleTimer = 0f;
+		}
+
 		private void OnSkip()
 		{
 			_idleTimer = 0f;
@@ -142,7 +151,7 @@ namespace GameJamTitle
 			}
 
 			_isPlaying = true;
-			SetHideOnPlay(false);
+			CacheAndHide();
 			var gen = Interlocked.Increment(ref _playGeneration);
 
 			try
@@ -188,18 +197,33 @@ namespace GameJamTitle
 
 			_isPlaying = false;
 			_idleTimer = 0f;
-			SetHideOnPlay(true);
+			RestoreHidden();
 		}
 
-		private void SetHideOnPlay(bool active)
+		private void CacheAndHide()
 		{
 			if (_hideOnPlay == null) return;
 
-			foreach (var go in _hideOnPlay)
+			_hideOnPlayCache = new bool[_hideOnPlay.Length];
+			for (var i = 0; i < _hideOnPlay.Length; i++)
 			{
-				if (go != null)
+				if (_hideOnPlay[i] != null)
 				{
-					go.SetActive(active);
+					_hideOnPlayCache[i] = _hideOnPlay[i].activeSelf;
+					_hideOnPlay[i].SetActive(false);
+				}
+			}
+		}
+
+		private void RestoreHidden()
+		{
+			if (_hideOnPlay == null || _hideOnPlayCache == null) return;
+
+			for (var i = 0; i < _hideOnPlay.Length; i++)
+			{
+				if (_hideOnPlay[i] != null)
+				{
+					_hideOnPlay[i].SetActive(_hideOnPlayCache[i]);
 				}
 			}
 		}
