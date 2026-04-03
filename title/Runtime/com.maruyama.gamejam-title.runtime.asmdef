@@ -1,0 +1,10 @@
+{
+  "name": "com.maruyama.gamejam-title.runtime",
+  "rootNamespace": "GameJamTitle",
+  "references": [
+    "Unity.InputSystem",
+    "DOTween.Modules"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}

@@ -1,0 +1,16 @@
+{
+  "name": "com.maruyama.gamejam-title",
+  "version": "0.1.0",
+  "displayName": "GameJam Title",
+  "description": "タイトル画面向けユーティリティ。一定時間操作がないと OnIdle イベントを発火する IdleTimer を提供する。",
+  "unity": "6000.4",
+  "keywords": [
+    "gamejam",
+    "title",
+    "idle"
+  ],
+  "author": {
+    "name": "Maruyama"
+  },
+  "dependencies": {}
+}
